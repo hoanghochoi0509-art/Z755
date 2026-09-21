@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_kpi_assignment_list" model="ir.ui.view">
+        <field name="name">kpi.assignment.list</field>
+        <field name="model">kpi.assignment</field>
+        <field name="arch" type="xml">
+            <list decoration-muted="state=='locked'" decoration-danger="not weight_ok and state=='draft'">
+                <field name="name"/><field name="period_id"/><field name="object_type"/><field name="target_name"/>
+                <field name="assignment_version" string="Phiên bản"/>
+                <field name="total_weight" string="TS (%)"/>
+                <field name="total_self"/><field name="total_reviewer"/><field name="total_team"/><field name="total_final"/>
+                <field name="weight_ok" column_invisible="1"/>
+                <field name="state" widget="badge" decoration-info="state in ('draft','negotiating')"
+                       decoration-warning="state in ('submit_assign','self_review','appraisal','kpi_team','pending_approval')"
+                       decoration-success="state in ('approved','locked','assigned','in_progress')"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_kpi_assignment_form" model="ir.ui.view">
+        <field name="name">kpi.assignment.form</field>
+        <field name="model">kpi.assignment</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_check_data" type="object" string="Kiểm tra dữ liệu" invisible="state not in ('draft','negotiating')"/>
+                    <button name="action_copy_previous" type="object" string="Sao chép kỳ trước" invisible="state != 'draft'"/>
+                    <!-- Giao KPI đơn vị -->
+                    <button name="action_submit_assign" type="object" string="Trình giao" class="btn-primary"
+                            invisible="state != 'draft' or object_type == 'employee'"/>
+                    <button name="action_approve_assign" type="object" string="Phê duyệt giao" class="btn-primary"
+                            invisible="state != 'submit_assign'" groups="z755_kpi.group_kpi_assigner"/>
+                    <!-- KPI cá nhân -->
+                    <button name="action_start_negotiation" type="object" string="Chuyển cá nhân bổ sung/đề xuất" class="btn-primary"
+                            invisible="state != 'draft' or object_type != 'employee'"/>
+                    <button name="action_employee_confirm" type="object" string="Cá nhân xác nhận" class="btn-primary"
+                            invisible="state != 'negotiating' or employee_confirmed_at"/>
+                    <button name="action_manager_confirm" type="object" string="Quản lý xác nhận" class="btn-primary"
+                            invisible="state != 'negotiating' or manager_confirmed_at"/>
+                    <button name="action_reset_confirmation" type="object" string="Thảo luận lại"
+                            invisible="state != 'negotiating' or (not employee_confirmed_at and not manager_confirmed_at)"/>
+                    <!-- Thực hiện & đánh giá -->
+                    <button name="action_start" type="object" string="Bắt đầu thực hiện" class="btn-primary" invisible="state != 'assigned'"/>
+                    <button name="action_open_self_review" type="object" string="Mở tự đánh giá" class="btn-primary" invisible="state != 'in_progress'"/>
+                    <button name="action_submit_self" type="object" string="Gửi thẩm định" class="btn-primary" invisible="state != 'self_review'"/>
+                    <button name="action_complete_appraisal" type="object" string="Hoàn tất thẩm định" class="btn-primary" invisible="state != 'appraisal'"/>
+                    <button name="action_submit_approval" type="object" string="Trình phê duyệt" class="btn-primary" invisible="state != 'kpi_team'"/>
+                    <button name="action_approve" type="object" string="Phê duyệt" class="btn-primary" invisible="state != 'pending_approval'"/>
+                    <button name="action_lock" type="object" string="Khóa hồ sơ" invisible="state != 'approved'" groups="z755_kpi.group_kpi_assigner"/>
+                    <!-- Trả lại/điều chỉnh/mở lại -->
+                    <button name="action_return" type="object" string="Trả lại"
+                            invisible="state not in ('negotiating','submit_assign','self_review','appraisal','kpi_team','pending_approval')"/>
+                    <button name="action_adjust" type="object" string="Điều chỉnh bảng giao" invisible="state not in ('assigned','in_progress')"
+                            groups="z755_kpi.group_kpi_assigner"/>
+                    <button name="action_reopen" type="object" string="Mở lại hồ sơ" invisible="state not in ('approved','locked')"
+                            groups="z755_kpi.group_kpi_leader"/>
+                    <button name="action_print_assign" type="object" string="In bảng giao"/>
+                    <button name="action_print_evaluation" type="object" string="In bảng đánh giá"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,submit_assign,assigned,in_progress,self_review,appraisal,kpi_team,pending_approval,approved,locked"/>
+                </header>
+                <sheet>
+                    <field name="is_editable" invisible="1"/>
+                    <field name="object_type" invisible="1"/>
+                    <div class="alert alert-info" invisible="not adjusting">Đang điều chỉnh (phiên bản <field name="assignment_version" class="oe_inline"/>): cần trình giao/phê duyệt lại. Lý do: <field name="change_reason" class="oe_inline"/></div>
+                    <div class="oe_title"><h1><field name="name"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="period_id" readonly="not is_editable" options="{'no_create': True}"/>
+                            <field name="object_type" readonly="not is_editable"/>
+                            <field name="department_id" readonly="not is_editable" invisible="object_type == 'company'" options="{'no_create': True}"/>
+                            <field name="employee_id" readonly="not is_editable" invisible="object_type != 'employee'" options="{'no_create': True}"/>
+                            <field name="parent_assignment_id" readonly="not is_editable"/>
+                        </group>
+                        <group>
+                            <field name="assigner_id"/>
+                            <field name="assignment_version"/>
+                            <label for="total_weight"/>
+                            <div><field name="total_weight" class="oe_inline"/> %
+                                <span class="text-success ms-2" invisible="not weight_ok">✓ Đủ điều kiện trình giao</span>
+                                <span class="text-danger ms-2" invisible="weight_ok">Chưa đủ 100%</span></div>
+                            <field name="weight_ok" invisible="1"/>
+                            <field name="assigned_at"/><field name="approved_at"/>
+                        </group>
+                    </group>
+                    <group invisible="object_type != 'employee'" string="Xác nhận KPI cá nhân">
+                        <group><field name="employee_confirmed_by"/><field name="employee_confirmed_at"/></group>
+                        <group><field name="manager_confirmed_by"/><field name="manager_confirmed_at"/></group>
+                    </group>
+                    <notebook>
+                        <page string="Dòng KPI" name="lines">
+                            <field name="line_ids" readonly="state not in ('draft','negotiating')">
+                                <list editable="bottom" decoration-danger="overdue">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="kpi_id" options="{'no_quick_create': False}" context="{'default_state': 'proposed'}"/>
+                                    <field name="target_operator"/>
+                                    <field name="target_value"/>
+                                    <field name="weight_pct" sum="Tổng trọng số"/>
+                                    <field name="score_cap"/>
+                                    <field name="due_date"/>
+                                    <field name="rule_mode"/>
+                                    <field name="scoring_rule_id" invisible="rule_mode != 'library'" required="rule_mode == 'library'"/>
+                                    <field name="inline_rule_id" invisible="rule_mode != 'inline'" readonly="1"/>
+                                    <button name="action_create_inline_rule" type="object" icon="fa-magic" string="Tạo quy tắc trực tiếp"
+                                            invisible="rule_mode != 'inline' or inline_rule_id"/>
+                                    <button name="action_edit_inline_rule" type="object" icon="fa-pencil" string="Sửa quy tắc"
+                                            invisible="rule_mode != 'inline' or not inline_rule_id"/>
+                                    <field name="data_source_id"/>
+                                    <field name="responsible_id"/>
+                                    <field name="reviewer_ids" widget="many2many_tags" optional="show"/>
+                                    <field name="approval_role" optional="hide"/>
+                                    <field name="overdue" column_invisible="1"/>
+                                    <button name="action_open_form" type="object" icon="fa-external-link" string="Chi tiết"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Kết quả &amp; điểm" name="results" invisible="state in ('draft','negotiating','submit_assign')">
+                            <field name="line_ids" readonly="1">
+                                <list>
+                                    <field name="kpi_name"/><field name="actual_value"/><field name="achievement_rate"/>
+                                    <field name="system_score"/><field name="self_score"/><field name="reviewer_score"/>
+                                    <field name="team_score"/><field name="final_score"/><field name="weight_pct"/>
+                                    <field name="final_weighted" sum="Tổng"/>
+                                    <field name="diff_flag" widget="boolean"/>
+                                    <button name="action_open_form" type="object" icon="fa-external-link" string="Cập nhật/Chấm"/>
+                                </list>
+                            </field>
+                            <group class="oe_subtotal_footer">
+                                <field name="total_system"/><field name="total_self"/><field name="total_reviewer"/>
+                                <field name="total_team"/><field name="total_final" class="oe_subtotal_footer_separator"/>
+                            </group>
+                            <field name="conclusion" placeholder="Ý kiến kết luận..."
+                                   readonly="state != 'pending_approval'"/>
+                        </page>
+                        <page string="Phiếu đánh giá" invisible="state in ('draft','negotiating','submit_assign','assigned','in_progress')">
+                            <field name="evaluation_ids">
+                                <list editable="bottom" create="0" delete="0">
+                                    <field name="line_id" readonly="1"/><field name="stage" readonly="1"/><field name="user_id" readonly="1"/>
+                                    <field name="system_score" readonly="1"/><field name="prev_stage_score"/>
+                                    <field name="score_pct" readonly="submitted"/><field name="diff"/>
+                                    <field name="evaluation_comment" readonly="submitted"/>
+                                    <field name="adjustment_reason" readonly="submitted"/>
+                                    <field name="weighted_score" sum="Tổng"/><field name="submitted" readonly="1"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Lịch sử phê duyệt">
+                            <field name="history_ids" readonly="1">
+                                <list><field name="date"/><field name="user_id"/><field name="action"/>
+                                    <field name="from_state"/><field name="to_state"/><field name="reason"/></list>
+                            </field>
+                        </page>
+                        <page string="Nhật ký sự việc"><field name="event_log_ids" readonly="1">
+                            <list><field name="event_datetime"/><field name="line_id"/><field name="name"/><field name="severity"/>
+                                <field name="affects_score"/><field name="state"/></list></field></page>
+                        <page string="Nhận xét tuần"><field name="weekly_review_ids" readonly="1">
+                            <list><field name="week_no"/><field name="good_work"/><field name="delayed_work"/><field name="remedy_request"/></list></field></page>
+                        <page string="Nhật ký thay đổi" groups="z755_kpi.group_kpi_leader,z755_kpi.group_kpi_admin">
+                            <field name="audit_log_ids" readonly="1">
+                                <list><field name="change_date"/><field name="user_id"/><field name="record_name"/><field name="field_name"/>
+                                    <field name="old_value"/><field name="new_value"/><field name="reason"/></list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_kpi_assignment_search" model="ir.ui.view">
+        <field name="name">kpi.assignment.search</field>
+        <field name="model">kpi.assignment</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/><field name="target_name"/><field name="period_id"/>
+                <filter name="unit" string="Đơn vị" domain="[('object_type','=','department')]"/>
+                <filter name="personal" string="Cá nhân" domain="[('object_type','=','employee')]"/>
+                <filter name="company" string="Công ty" domain="[('object_type','=','company')]"/>
+                <separator/>
+                <filter name="mine" string="Của tôi" domain="[('employee_id.user_id','=',uid)]"/>
+                <filter name="todo" string="Đang xử lý" domain="[('state','not in',('draft','approved','locked'))]"/>
+                <group expand="0" string="Nhóm theo">
+                    <filter name="g_period" string="Kỳ" context="{'group_by':'period_id'}"/>
+                    <filter name="g_state" string="Trạng thái" context="{'group_by':'state'}"/>
+                    <filter name="g_dept" string="Đơn vị" context="{'group_by':'department_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_kpi_assign_unit" model="ir.actions.act_window">
+        <field name="name">Giao KPI - Đơn vị</field><field name="res_model">kpi.assignment</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('object_type','=','department')]</field>
+        <field name="context">{'default_object_type': 'department'}</field>
+    </record>
+    <record id="action_kpi_assign_company" model="ir.actions.act_window">
+        <field name="name">Giao KPI - Công ty</field><field name="res_model">kpi.assignment</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('object_type','=','company')]</field>
+        <field name="context">{'default_object_type': 'company'}</field>
+    </record>
+    <record id="action_kpi_assign_personal" model="ir.actions.act_window">
+        <field name="name">Giao KPI - Cá nhân</field><field name="res_model">kpi.assignment</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('object_type','=','employee')]</field>
+        <field name="context">{'default_object_type': 'employee'}</field>
+    </record>
+    <record id="action_kpi_my_client" model="ir.actions.client">
+        <field name="name">KPI của tôi</field>
+        <field name="tag">z755_kpi.my_kpi</field>
+    </record>
+    <record id="action_kpi_my" model="ir.actions.act_window">
+        <field name="name">Bảng KPI của tôi</field><field name="res_model">kpi.assignment</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('employee_id.user_id','=',uid)]</field>
+    </record>
+    <record id="action_kpi_unit_tracking" model="ir.actions.act_window">
+        <field name="name">KPI đơn vị</field><field name="res_model">kpi.assignment</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('object_type','=','department'),('state','in',('assigned','in_progress','self_review'))]</field>
+    </record>
+    <record id="action_kpi_self_review" model="ir.actions.act_window">
+        <field name="name">Tự đánh giá</field><field name="res_model">kpi.assignment</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('state','=','self_review')]</field>
+    </record>
+    <record id="action_kpi_appraisal" model="ir.actions.act_window">
+        <field name="name">Thẩm định</field><field name="res_model">kpi.assignment</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('state','=','appraisal')]</field>
+    </record>
+    <record id="action_kpi_team" model="ir.actions.act_window">
+        <field name="name">Tổ KPI</field><field name="res_model">kpi.assignment</field>
+        <field name="view_mode">list,pivot,form</field>
+        <field name="domain">[('state','=','kpi_team')]</field>
+    </record>
+    <record id="action_kpi_approval" model="ir.actions.act_window">
+        <field name="name">Phê duyệt</field><field name="res_model">kpi.assignment</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('state','=','pending_approval')]</field>
+    </record>
+</odoo>

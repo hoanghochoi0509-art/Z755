@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_kpi_event_list" model="ir.ui.view">
+        <field name="name">kpi.event.log.list</field><field name="model">kpi.event.log</field>
+        <field name="arch" type="xml">
+            <list decoration-muted="state=='cancelled'">
+                <field name="event_datetime"/><field name="line_id"/><field name="name"/><field name="severity"/>
+                <field name="affects_score"/><field name="confirmed_by"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_kpi_event_form" model="ir.ui.view">
+        <field name="name">kpi.event.log.form</field><field name="model">kpi.event.log</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_confirm" type="object" string="Xác nhận" class="btn-primary" invisible="state != 'new'"/>
+                    <button name="action_cancel" type="object" string="Hủy (có lý do)" invisible="state == 'cancelled'"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/><field name="event_datetime"/><field name="recorded_at"/>
+                            <field name="assignment_id"/><field name="line_id"/>
+                            <field name="department_id"/><field name="employee_id"/>
+                        </group>
+                        <group>
+                            <field name="severity"/><field name="affects_score"/>
+                            <field name="rule_id" invisible="not affects_score"/>
+                            <field name="evidence_ids" widget="many2many_binary"/><field name="evidence_note"/>
+                            <field name="confirmed_by"/><field name="confirmed_at"/>
+                            <field name="cancel_reason" invisible="state != 'cancelled' and state != 'new' and state != 'confirmed'"/>
+                            <field name="user_id"/>
+                        </group>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+    <record id="view_kpi_event_search" model="ir.ui.view">
+        <field name="name">kpi.event.log.search</field><field name="model">kpi.event.log</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/><field name="line_id"/><field name="department_id"/>
+                <filter name="confirmed" string="Đã xác nhận" domain="[('state','=','confirmed')]"/>
+                <filter name="affects" string="Ảnh hưởng điểm" domain="[('affects_score','=',True)]"/>
+                <group expand="0" string="Nhóm theo">
+                    <filter name="g_sev" string="Mức độ" context="{'group_by':'severity'}"/>
+                    <filter name="g_period" string="Kỳ" context="{'group_by':'period_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    <record id="action_kpi_event" model="ir.actions.act_window">
+        <field name="name">Nhật ký KPI</field><field name="res_model">kpi.event.log</field><field name="view_mode">list,form</field>
+    </record>
+
+    <record id="view_kpi_weekly_list" model="ir.ui.view">
+        <field name="name">kpi.weekly.review.list</field><field name="model">kpi.weekly.review</field>
+        <field name="arch" type="xml">
+            <list><field name="period_id"/><field name="week_no"/><field name="date_from"/><field name="date_to"/>
+                <field name="assignment_id"/><field name="good_work"/><field name="delayed_work"/><field name="reviewer_id"/>
+                <field name="state" widget="badge"/></list>
+        </field>
+    </record>
+    <record id="view_kpi_weekly_form" model="ir.ui.view">
+        <field name="name">kpi.weekly.review.form</field><field name="model">kpi.weekly.review</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_confirm" type="object" string="Xác nhận" class="btn-primary" invisible="state != 'draft'"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group><field name="assignment_id"/><field name="period_id"/><field name="date_from"/><field name="date_to"/>
+                            <field name="week_no"/><field name="line_ids" widget="many2many_tags"/></group>
+                        <group><field name="reviewer_id"/><field name="reviewed_at"/>
+                            <field name="remedy_owner_id"/><field name="remedy_deadline"/></group>
+                    </group>
+                    <group>
+                        <field name="good_work"/><field name="delayed_work"/><field name="cause"/><field name="remedy_request"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+    <record id="action_kpi_weekly" model="ir.actions.act_window">
+        <field name="name">Theo dõi tuần</field><field name="res_model">kpi.weekly.review</field><field name="view_mode">list,form</field>
+    </record>
+
+    <record id="view_kpi_evidence_form" model="ir.ui.view">
+        <field name="name">kpi.evidence.form</field><field name="model">kpi.evidence</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="line_id" readonly="1"/><field name="name"/><field name="evidence_type"/>
+                    <field name="attachment_ids" widget="many2many_binary"/><field name="link_url"/>
+                    <field name="ref_model"/><field name="ref_res_id"/><field name="snapshot_value"/><field name="note"/>
+                </group>
+                <footer><button string="Lưu" special="save" class="btn-primary"/><button string="Đóng" special="cancel"/></footer>
+            </form>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="0">
+    <record id="rule_assignment_scope" model="ir.rule">
+        <field name="name">KPI assignment: phạm vi cá nhân/đơn vị</field>
+        <field name="model_id" ref="model_kpi_assignment"/>
+        <field name="domain_force">['|','|','|','|','|','|',('employee_id.user_id','=',user.id),('employee_id.parent_id.user_id','=',user.id),('department_id.manager_id.user_id','=',user.id),('line_ids.responsible_id.user_id','=',user.id),('line_ids.reviewer_ids','in',[user.id]),('line_ids.approver_ids','in',[user.id]),'&amp;',('object_type','!=','employee'),('department_id.member_ids.user_id','in',[user.id])]</field>
+        <field name="groups" eval="[(4, ref('z755_kpi.group_kpi_employee'))]"/>
+    </record>
+    <record id="rule_assignment_full_leader" model="ir.rule">
+        <field name="name">KPI assignment: toàn phạm vi (leader)</field>
+        <field name="model_id" ref="model_kpi_assignment"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('z755_kpi.group_kpi_leader'))]"/>
+    </record>
+    <record id="rule_assignment_full_member" model="ir.rule">
+        <field name="name">KPI assignment: toàn phạm vi (member)</field>
+        <field name="model_id" ref="model_kpi_assignment"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('z755_kpi.group_kpi_member'))]"/>
+    </record>
+    <record id="rule_assignment_full_assigner" model="ir.rule">
+        <field name="name">KPI assignment: toàn phạm vi (assigner)</field>
+        <field name="model_id" ref="model_kpi_assignment"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('z755_kpi.group_kpi_assigner'))]"/>
+    </record>
+    <record id="rule_assignment_full_admin" model="ir.rule">
+        <field name="name">KPI assignment: toàn phạm vi (admin)</field>
+        <field name="model_id" ref="model_kpi_assignment"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('z755_kpi.group_kpi_admin'))]"/>
+    </record>
+    <record id="rule_assignment_approver" model="ir.rule">
+        <field name="name">KPI assignment: hồ sơ trình duyệt</field>
+        <field name="model_id" ref="model_kpi_assignment"/>
+        <field name="domain_force">[('state','in',['pending_approval','approved','locked'])]</field>
+        <field name="groups" eval="[(4, ref('z755_kpi.group_kpi_approver'))]"/>
+    </record>
+    <record id="rule_assignment_line_scope" model="ir.rule">
+        <field name="name">KPI assignment_line: phạm vi cá nhân/đơn vị</field>
+        <field name="model_id" ref="model_kpi_assignment_line"/>
+        <field name="domain_force">['|','|','|','|','|','|',('assignment_id.employee_id.user_id','=',user.id),('assignment_id.employee_id.parent_id.user_id','=',user.id),('assignment_id.department_id.manager_id.user_id','=',user.id),('assignment_id.line_ids.responsible_id.user_id','=',user.id),('assignment_id.line_ids.reviewer_ids','in',[user.id]),('assignment_id.line_ids.approver_ids','in',[user.id]),'&amp;',('assignment_id.object_type','!=','employee'),('assignment_id.department_id.member_ids.user_id','in',[user.id])]</field>
+        <field name="groups" eval="[(4, ref('z755_kpi.group_kpi_employee'))]"/>
+    </record>
+    <record id="rule_assignment_line_full_leader" model="ir.rule">
+        <field name="name">KPI assignment_line: toàn phạm vi (leader)</field>
+        <field name="model_id" ref="model_kpi_assignment_line"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('z755_kpi.group_kpi_leader'))]"/>
+    </record>
+    <record id="rule_assignment_line_full_member" model="ir.rule">
+        <field name="name">KPI assignment_line: toàn phạm vi (member)</field>
+        <field name="model_id" ref="model_kpi_assignment_line"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('z755_kpi.group_kpi_member'))]"/>
+    </record>
+    <record id="rule_assignment_line_full_assigner" model="ir.rule">
+        <field name="name">KPI assignment_line: toàn phạm vi (assigner)</field>
+        <field name="model_id" ref="model_kpi_assignment_line"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('z755_kpi.group_kpi_assigner'))]"/>
+    </record>
+    <record id="rule_assignment_line_full_admin" model="ir.rule">
+        <field name="name">KPI assignment_line: toàn phạm vi (admin)</field>
+        <field name="model_id" ref="model_kpi_assignment_line"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('z755_kpi.group_kpi_admin'))]"/>
+    </record>
+    <record id="rule_assignment_line_approver" model="ir.rule">
+        <field name="name">KPI assignment_line: hồ sơ trình duyệt</field>
+        <field name="model_id" ref="model_kpi_assignment_line"/>
+        <field name="domain_force">[('assignment_id.state','in',['pending_approval','approved','locked'])]</field>
+        <field name="groups" eval="[(4, ref('z755_kpi.group_kpi_approver'))]"/>
+    </record>
+    <record id="rule_evaluation_scope" model="ir.rule">
+        <field name="name">KPI evaluation: phạm vi cá nhân/đơn vị</field>
+        <field name="model_id" ref="model_kpi_evaluation"/>
+        <field name="domain_force">['|','|','|','|','|','|',('assignment_id.employee_id.user_id','=',user.id),('assignment_id.employee_id.parent_id.user_id','=',user.id),('assignment_id.department_id.manager_id.user_id','=',user.id),('assignment_id.line_ids.responsible_id.user_id','=',user.id),('assignment_id.line_ids.reviewer_ids','in',[user.id]),('assignment_id.line_ids.approver_ids','in',[user.id]),'&amp;',('assignment_id.object_type','!=','employee'),('assignment_id.department_id.member_ids.user_id','in',[user.id])]</field>
+        <field name="groups" eval="[(4, ref('z755_kpi.group_kpi_employee'))]"/>
+    </record>
+    <record id="rule_evaluation_full_leader" model="ir.rule">
+        <field name="name">KPI evaluation: toàn phạm vi (leader)</field>
+        <field name="model_id" ref="model_kpi_evaluation"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('z755_kpi.group_kpi_leader'))]"/>
+    </record>
+    <record id="rule_evaluation_full_member" model="ir.rule">
+        <field name="name">KPI evaluation: toàn phạm vi (member)</field>
+        <field name="model_id" ref="model_kpi_evaluation"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('z755_kpi.group_kpi_member'))]"/>
+    </record>
+    <record id="rule_evaluation_full_assigner" model="ir.rule">
+        <field name="name">KPI evaluation: toàn phạm vi (assigner)</field>
+        <field name="model_id" ref="model_kpi_evaluation"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('z755_kpi.group_kpi_assigner'))]"/>
+    </record>
+    <record id="rule_evaluation_full_admin" model="ir.rule">
+        <field name="name">KPI evaluation: toàn phạm vi (admin)</field>
+        <field name="model_id" ref="model_kpi_evaluation"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('z755_kpi.group_kpi_admin'))]"/>
+    </record>
+    <record id="rule_evaluation_approver" model="ir.rule">
+        <field name="name">KPI evaluation: hồ sơ trình duyệt</field>
+        <field name="model_id" ref="model_kpi_evaluation"/>
+        <field name="domain_force">[('assignment_id.state','in',['pending_approval','approved','locked'])]</field>
+        <field name="groups" eval="[(4, ref('z755_kpi.group_kpi_approver'))]"/>
+    </record>
+    <record id="rule_evidence_scope" model="ir.rule">
+        <field name="name">KPI evidence: phạm vi cá nhân/đơn vị</field>
+        <field name="model_id" ref="model_kpi_evidence"/>
+        <field name="domain_force">['|','|','|','|','|','|',('assignment_id.employee_id.user_id','=',user.id),('assignment_id.employee_id.parent_id.user_id','=',user.id),('assignment_id.department_id.manager_id.user_id','=',user.id),('assignment_id.line_ids.responsible_id.user_id','=',user.id),('assignment_id.line_ids.reviewer_ids','in',[user.id]),('assignment_id.line_ids.approver_ids','in',[user.id]),'&amp;',('assignment_id.object_type','!=','employee'),('assignment_id.department_id.member_ids.user_id','in',[user.id])]</field>
+        <field name="groups" eval="[(4, ref('z755_kpi.group_kpi_employee'))]"/>
+    </record>
+    <record id="rule_evidence_full_leader" model="ir.rule">
+        <field name="name">KPI evidence: toàn phạm vi (leader)</field>
+        <field name="model_id" ref="model_kpi_evidence"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('z755_kpi.group_kpi_leader'))]"/>
+    </record>
+    <record id="rule_evidence_full_member" model="ir.rule">
+        <field name="name">KPI evidence: toàn phạm vi (member)</field>
+        <field name="model_id" ref="model_kpi_evidence"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('z755_kpi.group_kpi_member'))]"/>
+    </record>
+    <record id="rule_evidence_full_assigner" model="ir.rule">
+        <field name="name">KPI evidence: toàn phạm vi (assigner)</field>
+        <field name="model_id" ref="model_kpi_evidence"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('z755_kpi.group_kpi_assigner'))]"/>
+    </record>
+    <record id="rule_evidence_full_admin" model="ir.rule">
+        <field name="name">KPI evidence: toàn phạm vi (admin)</field>
+        <field name="model_id" ref="model_kpi_evidence"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('z755_kpi.group_kpi_admin'))]"/>
+    </record>
+    <record id="rule_evidence_approver" model="ir.rule">
+        <field name="name">KPI evidence: hồ sơ trình duyệt</field>
+        <field name="model_id" ref="model_kpi_evidence"/>
+        <field name="domain_force">[('assignment_id.state','in',['pending_approval','approved','locked'])]</field>
+        <field name="groups" eval="[(4, ref('z755_kpi.group_kpi_approver'))]"/>
+    </record>
+    <record id="rule_weekly_review_scope" model="ir.rule">
+        <field name="name">KPI weekly_review: phạm vi cá nhân/đơn vị</field>
+        <field name="model_id" ref="model_kpi_weekly_review"/>
+        <field name="domain_force">['|','|','|','|','|','|',('assignment_id.employee_id.user_id','=',user.id),('assignment_id.employee_id.parent_id.user_id','=',user.id),('assignment_id.department_id.manager_id.user_id','=',user.id),('assignment_id.line_ids.responsible_id.user_id','=',user.id),('assignment_id.line_ids.reviewer_ids','in',[user.id]),('assignment_id.line_ids.approver_ids','in',[user.id]),'&amp;',('assignment_id.object_type','!=','employee'),('assignment_id.department_id.member_ids.user_id','in',[user.id])]</field>
+        <field name="groups" eval="[(4, ref('z755_kpi.group_kpi_employee'))]"/>
+    </record>
+    <record id="rule_weekly_review_full_leader" model="ir.rule">
+        <field name="name">KPI weekly_review: toàn phạm vi (leader)</field>
+        <field name="model_id" ref="model_kpi_weekly_review"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('z755_kpi.group_kpi_leader'))]"/>
+    </record>
+    <record id="rule_weekly_review_full_member" model="ir.rule">
+        <field name="name">KPI weekly_review: toàn phạm vi (member)</field>
+        <field name="model_id" ref="model_kpi_weekly_review"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('z755_kpi.group_kpi_member'))]"/>
+    </record>
+    <record id="rule_weekly_review_full_assigner" model="ir.rule">
+        <field name="name">KPI weekly_review: toàn phạm vi (assigner)</field>
+        <field name="model_id" ref="model_kpi_weekly_review"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('z755_kpi.group_kpi_assigner'))]"/>
+    </record>
+    <record id="rule_weekly_review_full_admin" model="ir.rule">
+        <field name="name">KPI weekly_review: toàn phạm vi (admin)</field>
+        <field name="model_id" ref="model_kpi_weekly_review"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('z755_kpi.group_kpi_admin'))]"/>
+    </record>
+    <record id="rule_weekly_review_approver" model="ir.rule">
+        <field name="name">KPI weekly_review: hồ sơ trình duyệt</field>
+        <field name="model_id" ref="model_kpi_weekly_review"/>
+        <field name="domain_force">[('assignment_id.state','in',['pending_approval','approved','locked'])]</field>
+        <field name="groups" eval="[(4, ref('z755_kpi.group_kpi_approver'))]"/>
+    </record>
+    <record id="rule_event_log_scope" model="ir.rule">
+        <field name="name">KPI event_log: phạm vi cá nhân/đơn vị</field>
+        <field name="model_id" ref="model_kpi_event_log"/>
+        <field name="domain_force">['|',('assignment_id','=',False),'|','|','|','|','|','|',('assignment_id.employee_id.user_id','=',user.id),('assignment_id.employee_id.parent_id.user_id','=',user.id),('assignment_id.department_id.manager_id.user_id','=',user.id),('assignment_id.line_ids.responsible_id.user_id','=',user.id),('assignment_id.line_ids.reviewer_ids','in',[user.id]),('assignment_id.line_ids.approver_ids','in',[user.id]),'&amp;',('assignment_id.object_type','!=','employee'),('assignment_id.department_id.member_ids.user_id','in',[user.id])]</field>
+        <field name="groups" eval="[(4, ref('z755_kpi.group_kpi_employee'))]"/>
+    </record>
+    <record id="rule_event_log_full_leader" model="ir.rule">
+        <field name="name">KPI event_log: toàn phạm vi (leader)</field>
+        <field name="model_id" ref="model_kpi_event_log"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('z755_kpi.group_kpi_leader'))]"/>
+    </record>
+    <record id="rule_event_log_full_member" model="ir.rule">
+        <field name="name">KPI event_log: toàn phạm vi (member)</field>
+        <field name="model_id" ref="model_kpi_event_log"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('z755_kpi.group_kpi_member'))]"/>
+    </record>
+    <record id="rule_event_log_full_assigner" model="ir.rule">
+        <field name="name">KPI event_log: toàn phạm vi (assigner)</field>
+        <field name="model_id" ref="model_kpi_event_log"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('z755_kpi.group_kpi_assigner'))]"/>
+    </record>
+    <record id="rule_event_log_full_admin" model="ir.rule">
+        <field name="name">KPI event_log: toàn phạm vi (admin)</field>
+        <field name="model_id" ref="model_kpi_event_log"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('z755_kpi.group_kpi_admin'))]"/>
+    </record>
+    <record id="rule_event_log_approver" model="ir.rule">
+        <field name="name">KPI event_log: hồ sơ trình duyệt</field>
+        <field name="model_id" ref="model_kpi_event_log"/>
+        <field name="domain_force">[('assignment_id.state','in',['pending_approval','approved','locked'])]</field>
+        <field name="groups" eval="[(4, ref('z755_kpi.group_kpi_approver'))]"/>
+    </record>
+    <record id="rule_approval_history_scope" model="ir.rule">
+        <field name="name">KPI approval_history: phạm vi cá nhân/đơn vị</field>
+        <field name="model_id" ref="model_kpi_approval_history"/>
+        <field name="domain_force">['|','|','|','|','|','|',('assignment_id.employee_id.user_id','=',user.id),('assignment_id.employee_id.parent_id.user_id','=',user.id),('assignment_id.department_id.manager_id.user_id','=',user.id),('assignment_id.line_ids.responsible_id.user_id','=',user.id),('assignment_id.line_ids.reviewer_ids','in',[user.id]),('assignment_id.line_ids.approver_ids','in',[user.id]),'&amp;',('assignment_id.object_type','!=','employee'),('assignment_id.department_id.member_ids.user_id','in',[user.id])]</field>
+        <field name="groups" eval="[(4, ref('z755_kpi.group_kpi_employee'))]"/>
+    </record>
+    <record id="rule_approval_history_full_leader" model="ir.rule">
+        <field name="name">KPI approval_history: toàn phạm vi (leader)</field>
+        <field name="model_id" ref="model_kpi_approval_history"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('z755_kpi.group_kpi_leader'))]"/>
+    </record>
+    <record id="rule_approval_history_full_member" model="ir.rule">
+        <field name="name">KPI approval_history: toàn phạm vi (member)</field>
+        <field name="model_id" ref="model_kpi_approval_history"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('z755_kpi.group_kpi_member'))]"/>
+    </record>
+    <record id="rule_approval_history_full_assigner" model="ir.rule">
+        <field name="name">KPI approval_history: toàn phạm vi (assigner)</field>
+        <field name="model_id" ref="model_kpi_approval_history"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('z755_kpi.group_kpi_assigner'))]"/>
+    </record>
+    <record id="rule_approval_history_full_admin" model="ir.rule">
+        <field name="name">KPI approval_history: toàn phạm vi (admin)</field>
+        <field name="model_id" ref="model_kpi_approval_history"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('z755_kpi.group_kpi_admin'))]"/>
+    </record>
+    <record id="rule_approval_history_approver" model="ir.rule">
+        <field name="name">KPI approval_history: hồ sơ trình duyệt</field>
+        <field name="model_id" ref="model_kpi_approval_history"/>
+        <field name="domain_force">[('assignment_id.state','in',['pending_approval','approved','locked'])]</field>
+        <field name="groups" eval="[(4, ref('z755_kpi.group_kpi_approver'))]"/>
+    </record>
+    <record id="rule_audit_log_scope" model="ir.rule">
+        <field name="name">KPI audit_log: phạm vi cá nhân/đơn vị</field>
+        <field name="model_id" ref="model_kpi_audit_log"/>
+        <field name="domain_force">['|',('assignment_id','=',False),'|','|','|','|','|','|',('assignment_id.employee_id.user_id','=',user.id),('assignment_id.employee_id.parent_id.user_id','=',user.id),('assignment_id.department_id.manager_id.user_id','=',user.id),('assignment_id.line_ids.responsible_id.user_id','=',user.id),('assignment_id.line_ids.reviewer_ids','in',[user.id]),('assignment_id.line_ids.approver_ids','in',[user.id]),'&amp;',('assignment_id.object_type','!=','employee'),('assignment_id.department_id.member_ids.user_id','in',[user.id])]</field>
+        <field name="groups" eval="[(4, ref('z755_kpi.group_kpi_employee'))]"/>
+    </record>
+    <record id="rule_audit_log_full_leader" model="ir.rule">
+        <field name="name">KPI audit_log: toàn phạm vi (leader)</field>
+        <field name="model_id" ref="model_kpi_audit_log"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('z755_kpi.group_kpi_leader'))]"/>
+    </record>
+    <record id="rule_audit_log_full_member" model="ir.rule">
+        <field name="name">KPI audit_log: toàn phạm vi (member)</field>
+        <field name="model_id" ref="model_kpi_audit_log"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('z755_kpi.group_kpi_member'))]"/>
+    </record>
+    <record id="rule_audit_log_full_assigner" model="ir.rule">
+        <field name="name">KPI audit_log: toàn phạm vi (assigner)</field>
+        <field name="model_id" ref="model_kpi_audit_log"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('z755_kpi.group_kpi_assigner'))]"/>
+    </record>
+    <record id="rule_audit_log_full_admin" model="ir.rule">
+        <field name="name">KPI audit_log: toàn phạm vi (admin)</field>
+        <field name="model_id" ref="model_kpi_audit_log"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('z755_kpi.group_kpi_admin'))]"/>
+    </record>
+    <record id="rule_audit_log_approver" model="ir.rule">
+        <field name="name">KPI audit_log: hồ sơ trình duyệt</field>
+        <field name="model_id" ref="model_kpi_audit_log"/>
+        <field name="domain_force">[('assignment_id.state','in',['pending_approval','approved','locked'])]</field>
+        <field name="groups" eval="[(4, ref('z755_kpi.group_kpi_approver'))]"/>
+    </record>
+</odoo>

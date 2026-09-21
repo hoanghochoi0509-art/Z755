@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_assignment" model="ir.actions.report">
+        <field name="name">Bảng giao KPI</field>
+        <field name="model">kpi.assignment</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">z755_kpi.report_assignment</field>
+        <field name="report_file">z755_kpi.report_assignment</field>
+        <field name="print_report_name">'Bang_giao_KPI_%s' % object.name.replace('/', '_')</field>
+        <field name="binding_model_id" ref="model_kpi_assignment"/>
+        <field name="binding_type">report</field>
+    </record>
+    <record id="action_report_evaluation" model="ir.actions.report">
+        <field name="name">Bảng đánh giá KPI</field>
+        <field name="model">kpi.assignment</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">z755_kpi.report_evaluation</field>
+        <field name="report_file">z755_kpi.report_evaluation</field>
+        <field name="print_report_name">'Bang_danh_gia_KPI_%s' % object.name.replace('/', '_')</field>
+        <field name="binding_model_id" ref="model_kpi_assignment"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_assignment">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h3 class="text-center">BẢNG GIAO KPI <t t-esc="o.period_id.name"/></h3>
+                        <p class="text-center"><t t-esc="o.target_name"/> - Số: <t t-esc="o.name"/> - Phiên bản <t t-esc="o.assignment_version"/>
+                            <t t-if="o.period_id.regulation_ref"> - Căn cứ: <t t-esc="o.period_id.regulation_ref"/></t></p>
+                        <table class="table table-sm table-bordered">
+                            <thead><tr><th>TT</th><th>Mã KPI</th><th>Nội dung KPI</th><th>ĐVT</th><th>Chỉ tiêu</th><th>Trọng số</th>
+                                <th>Điểm trần</th><th>Hạn</th><th>Chủ trì</th><th>Nguồn dữ liệu</th><th>Quy tắc</th></tr></thead>
+                            <tbody>
+                                <t t-foreach="o.line_ids" t-as="l">
+                                    <tr>
+                                        <td><t t-esc="l_index + 1"/></td>
+                                        <td><t t-esc="l.kpi_code_snapshot or l.kpi_code"/></td>
+                                        <td><t t-esc="l.kpi_name"/></td>
+                                        <td><t t-esc="l.uom_id.name"/></td>
+                                        <td><t t-esc="l.target_operator"/> <t t-esc="l.target_value"/></td>
+                                        <td><t t-esc="l.weight_pct"/>%</td>
+                                        <td><t t-esc="l.score_cap"/></td>
+                                        <td><t t-esc="l.due_date"/></td>
+                                        <td><t t-esc="l.responsible_id.name"/></td>
+                                        <td><t t-esc="l.data_source_id.name"/></td>
+                                        <td><t t-esc="l.effective_rule_id.display_name"/></td>
+                                    </tr>
+                                </t>
+                                <tr><td colspan="5"><b>Tổng trọng số</b></td><td colspan="6"><b><t t-esc="o.total_weight"/>%</b></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <template id="report_evaluation">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h3 class="text-center">BẢNG ĐÁNH GIÁ KPI <t t-esc="o.period_id.name"/></h3>
+                        <p class="text-center"><t t-esc="o.target_name"/> - Số: <t t-esc="o.name"/></p>
+                        <table class="table table-sm table-bordered">
+                            <thead><tr><th>TT</th><th>KPI</th><th>Chỉ tiêu</th><th>Kết quả TT</th><th>TS</th>
+                                <th>Tự chấm</th><th>Thẩm định</th><th>Tổ KPI đề xuất</th><th>Kết luận</th><th>Điểm QĐ</th></tr></thead>
+                            <tbody>
+                                <t t-foreach="o.line_ids" t-as="l">
+                                    <tr>
+                                        <td><t t-esc="l_index + 1"/></td><td><t t-esc="l.kpi_name"/></td>
+                                        <td><t t-esc="l.target_operator"/> <t t-esc="l.target_value"/></td>
+                                        <td><t t-esc="l.actual_value"/></td><td><t t-esc="l.weight_pct"/>%</td>
+                                        <td><t t-esc="l.self_score"/></td><td><t t-esc="l.reviewer_score"/></td>
+                                        <td><t t-esc="l.team_score"/></td><td><t t-esc="l.final_score"/></td>
+                                        <td><t t-esc="l.final_weighted"/></td>
+                                    </tr>
+                                </t>
+                                <tr><td colspan="5"><b>Tổng điểm</b></td><td><b><t t-esc="o.total_self"/></b></td>
+                                    <td><b><t t-esc="o.total_reviewer"/></b></td><td><b><t t-esc="o.total_team"/></b></td>
+                                    <td colspan="2"><b><t t-esc="o.total_final"/></b></td></tr>
+                            </tbody>
+                        </table>
+                        <p t-if="o.conclusion">Ý kiến kết luận: <t t-esc="o.conclusion"/></p>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

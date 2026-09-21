@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- ĐVT -->
+    <record id="uom_pct" model="kpi.uom"><field name="name">%</field></record>
+    <record id="uom_case" model="kpi.uom"><field name="name">Vụ</field></record>
+    <record id="uom_day" model="kpi.uom"><field name="name">Ngày</field></record>
+    <record id="uom_file" model="kpi.uom"><field name="name">Hồ sơ</field></record>
+    <record id="uom_bil" model="kpi.uom"><field name="name">Tỷ đồng</field></record>
+
+    <!-- Lĩnh vực -->
+    <record id="field_infra" model="kpi.field"><field name="name">Hạ tầng CNTT</field></record>
+    <record id="field_support" model="kpi.field"><field name="name">Hỗ trợ</field></record>
+    <record id="field_security" model="kpi.field"><field name="name">ATTT</field></record>
+    <record id="field_dx" model="kpi.field"><field name="name">Chuyển đổi số</field></record>
+    <record id="field_asset" model="kpi.field"><field name="name">Tài sản</field></record>
+    <record id="field_discipline" model="kpi.field"><field name="name">Kỷ luật</field></record>
+
+    <!-- Nguồn dữ liệu -->
+    <record id="src_monitor" model="kpi.data.source">
+        <field name="name">Nhật ký hệ thống; phần mềm giám sát; nhật ký sự cố; báo cáo đơn vị sử dụng</field>
+        <field name="source_type">system</field><field name="collection_method">auto</field>
+        <field name="cutoff_note">Theo cấu hình kỳ</field><field name="required_evidence">Snapshot chỉ số</field>
+    </record>
+    <record id="src_ticket" model="kpi.data.source">
+        <field name="name">Phiếu yêu cầu hỗ trợ; nhật ký xử lý; hệ thống quản lý sự cố</field>
+        <field name="source_type">odoo</field><field name="collection_method">link</field>
+        <field name="cutoff_note">Cuối kỳ</field><field name="required_evidence">Danh sách phiếu</field>
+    </record>
+    <record id="src_security" model="kpi.data.source">
+        <field name="name">Nhật ký hệ thống; cảnh báo ATTT; biên bản kiểm tra; hồ sơ sự cố</field>
+        <field name="source_type">system</field><field name="collection_method">manual</field>
+        <field name="cutoff_note">Theo cấu hình kỳ</field><field name="required_evidence">Biên bản/hồ sơ sự cố</field>
+    </record>
+    <record id="src_dx_plan" model="kpi.data.source">
+        <field name="name">Kế hoạch CĐS 2026; danh mục nhiệm vụ CĐS được giao; hồ sơ triển khai; biên bản nghiệm thu</field>
+        <field name="source_type">document</field><field name="collection_method">upload</field>
+        <field name="cutoff_note">Theo mốc</field><field name="required_evidence">Biên bản/mốc hoàn thành</field>
+    </record>
+    <record id="src_asset" model="kpi.data.source">
+        <field name="name">Danh mục thiết bị; phiếu cấp phát; nhật ký bảo trì; biên bản kiểm tra</field>
+        <field name="source_type">document</field><field name="collection_method">upload</field>
+        <field name="cutoff_note">Cuối kỳ</field><field name="required_evidence">Biên bản kiểm tra</field>
+    </record>
+    <record id="src_discipline" model="kpi.data.source">
+        <field name="name">Văn bản giao nhiệm vụ; phiếu yêu cầu phối hợp; giao ban; báo cáo kết quả</field>
+        <field name="source_type">document</field><field name="collection_method">upload</field>
+        <field name="cutoff_note">Cuối kỳ</field><field name="required_evidence">Báo cáo kết quả</field>
+    </record>
+
+    <!-- Rule thư viện (tham số mẫu pilot, cần Tổ KPI xác nhận) -->
+    <record id="rule_rate_100" model="kpi.scoring.rule">
+        <field name="name">Theo tỷ lệ hoàn thành</field><field name="method">RATE</field>
+        <field name="score_cap">100</field><field name="state">confirmed</field><field name="code">QT-RATE-100</field>
+    </record>
+    <record id="rule_rate_120" model="kpi.scoring.rule">
+        <field name="name">Tỷ lệ có thưởng vượt mức</field><field name="method">RATE</field>
+        <field name="score_cap">120</field><field name="state">confirmed</field><field name="code">QT-RATE-120</field>
+    </record>
+    <record id="rule_level_01" model="kpi.scoring.rule">
+        <field name="name">Nhẹ / vừa / nặng</field><field name="method">LEVEL</field>
+        <field name="score_cap">100</field><field name="state">confirmed</field><field name="code">QT-LEVEL-01</field>
+    </record>
+    <record id="rule_level_01_l1" model="kpi.scoring.rule.line">
+        <field name="rule_id" ref="rule_level_01"/><field name="sequence">1</field><field name="label">Lỗi nặng trừ 30%</field>
+        <field name="level">heavy</field><field name="action">deduct_pct</field><field name="value">30</field>
+    </record>
+    <record id="rule_level_01_l2" model="kpi.scoring.rule.line">
+        <field name="rule_id" ref="rule_level_01"/><field name="sequence">2</field><field name="label">Lỗi vừa trừ 10%</field>
+        <field name="level">medium</field><field name="action">deduct_pct</field><field name="value">10</field>
+    </record>
+    <record id="rule_level_01_l3" model="kpi.scoring.rule.line">
+        <field name="rule_id" ref="rule_level_01"/><field name="sequence">3</field><field name="label">Lỗi nhẹ trừ 20%</field>
+        <field name="level">light</field><field name="action">deduct_pct</field><field name="value">20</field>
+    </record>
+    <record id="rule_delay_20" model="kpi.scoring.rule">
+        <field name="name">Chậm mốc trừ điểm</field><field name="method">DATE_DELAY</field>
+        <field name="score_cap">100</field><field name="state">confirmed</field><field name="code">QT-DELAY-20</field>
+    </record>
+    <record id="rule_delay_20_l1" model="kpi.scoring.rule.line">
+        <field name="rule_id" ref="rule_delay_20"/><field name="label">Mỗi 1 ngày chậm trừ 20%</field>
+        <field name="action">deduct_pct</field><field name="value">20</field><field name="step">1</field>
+    </record>
+    <record id="rule_inc_01" model="kpi.scoring.rule">
+        <field name="name">Theo số lỗi/sự cố</field><field name="method">INCIDENT_COUNT</field>
+        <field name="score_cap">100</field><field name="state">confirmed</field><field name="code">QT-INC-01</field>
+    </record>
+    <record id="rule_inc_01_l1" model="kpi.scoring.rule.line">
+        <field name="rule_id" ref="rule_inc_01"/><field name="sequence">1</field><field name="label">Sự việc nghiêm trọng = 0 điểm</field>
+        <field name="level">critical</field><field name="action">zero</field>
+    </record>
+    <record id="rule_inc_01_l2" model="kpi.scoring.rule.line">
+        <field name="rule_id" ref="rule_inc_01"/><field name="sequence">2</field><field name="label">Mỗi lỗi trừ 20%</field>
+        <field name="action">deduct_pct</field><field name="value">20</field>
+    </record>
+
+    <!-- 7 KPI Ban CNTT (dữ liệu seed pilot) -->
+    <record id="kpi_ht_001" model="kpi.catalog">
+        <field name="code">CNTT-HT-001</field><field name="name">Bảo đảm hệ thống CNTT, mạng và các hệ thống số phục vụ Công ty hoạt động ổn định</field>
+        <field name="field_id" ref="field_infra"/><field name="uom_id" ref="uom_pct"/><field name="state">confirmed</field>
+    </record>
+    <record id="kpi_ht_002" model="kpi.catalog">
+        <field name="code">CNTT-HT-002</field><field name="name">Xử lý sự cố và yêu cầu hỗ trợ CNTT đúng thời hạn</field>
+        <field name="field_id" ref="field_support"/><field name="uom_id" ref="uom_pct"/><field name="state">confirmed</field>
+    </record>
+    <record id="kpi_attt_001" model="kpi.catalog">
+        <field name="code">CNTT-ATTT-001</field><field name="name">Bảo đảm an toàn thông tin, an ninh mạng và bảo vệ dữ liệu</field>
+        <field name="field_id" ref="field_security"/><field name="kpi_type">compliance</field><field name="value_type">count</field>
+        <field name="uom_id" ref="uom_case"/><field name="state">confirmed</field>
+    </record>
+    <record id="kpi_cds_001" model="kpi.catalog">
+        <field name="code">CNTT-CDS-001</field><field name="name">Triển khai các nhiệm vụ, giải pháp chuyển đổi số trọng điểm phục vụ quản trị và SXKD của Công ty</field>
+        <field name="field_id" ref="field_dx"/><field name="uom_id" ref="uom_pct"/><field name="state">confirmed</field>
+    </record>
+    <record id="kpi_cds_002" model="kpi.catalog">
+        <field name="code">CNTT-CDS-002</field><field name="name">Thực hiện nhiệm vụ chuyển đổi số, ứng dụng CNTT phục vụ quản lý và SXKD</field>
+        <field name="field_id" ref="field_dx"/><field name="uom_id" ref="uom_pct"/><field name="state">confirmed</field>
+    </record>
+    <record id="kpi_ts_001" model="kpi.catalog">
+        <field name="code">CNTT-TS-001</field><field name="name">Bảo đảm thiết bị và tài nguyên CNTT đáp ứng yêu cầu sử dụng</field>
+        <field name="field_id" ref="field_asset"/><field name="uom_id" ref="uom_pct"/><field name="state">confirmed</field>
+    </record>
+    <record id="kpi_kl_001" model="kpi.catalog">
+        <field name="code">CNTT-KL-001</field><field name="name">Chấp hành chế độ công tác, phối hợp, hiệp đồng, CTĐ, CTCT và thực hiện nhiệm vụ được giao</field>
+        <field name="field_id" ref="field_discipline"/><field name="kpi_type">compliance</field><field name="uom_id" ref="uom_pct"/><field name="state">confirmed</field>
+    </record>
+</odoo>

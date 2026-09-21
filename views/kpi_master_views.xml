@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_kpi_source_list" model="ir.ui.view">
+        <field name="name">kpi.data.source.list</field>
+        <field name="model">kpi.data.source</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="name"/><field name="source_type"/><field name="owner_department_id"/>
+                <field name="collection_method"/><field name="cutoff_note"/><field name="required_evidence"/>
+            </list>
+        </field>
+    </record>
+    <record id="action_kpi_source" model="ir.actions.act_window">
+        <field name="name">Nguồn dữ liệu</field><field name="res_model">kpi.data.source</field><field name="view_mode">list,form</field>
+    </record>
+    <record id="view_kpi_uom_list" model="ir.ui.view">
+        <field name="name">kpi.uom.list</field><field name="model">kpi.uom</field>
+        <field name="arch" type="xml"><list editable="bottom"><field name="name"/></list></field>
+    </record>
+    <record id="action_kpi_uom" model="ir.actions.act_window">
+        <field name="name">Đơn vị tính</field><field name="res_model">kpi.uom</field><field name="view_mode">list</field>
+    </record>
+    <record id="view_kpi_group_list" model="ir.ui.view">
+        <field name="name">kpi.group.list</field><field name="model">kpi.group</field>
+        <field name="arch" type="xml"><list editable="bottom"><field name="code"/><field name="name"/></list></field>
+    </record>
+    <record id="action_kpi_group" model="ir.actions.act_window">
+        <field name="name">Nhóm KPI / BSC</field><field name="res_model">kpi.group</field><field name="view_mode">list</field>
+    </record>
+    <record id="view_kpi_field_list" model="ir.ui.view">
+        <field name="name">kpi.field.list</field><field name="model">kpi.field</field>
+        <field name="arch" type="xml"><list editable="bottom"><field name="code"/><field name="name"/></list></field>
+    </record>
+    <record id="action_kpi_field" model="ir.actions.act_window">
+        <field name="name">Lĩnh vực</field><field name="res_model">kpi.field</field><field name="view_mode">list</field>
+    </record>
+</odoo>

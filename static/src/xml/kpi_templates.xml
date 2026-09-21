@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates xml:space="preserve">
+    <t t-name="z755_kpi.Sidebar">
+        <aside class="z755_sidebar" t-if="state.visible">
+            <div class="z755_brand">
+                <div class="z755_brand_title">Z755 <span>•</span> KPI</div>
+                <div class="z755_brand_sub">Trung tâm hiệu suất Odoo</div>
+            </div>
+            <nav class="z755_nav">
+                <t t-foreach="items" t-as="item" t-key="item.id">
+                    <a href="#" class="z755_nav_item" t-att-class="{'active': item.active}" t-on-click.prevent="() => this.onClick(item)">
+                        <t t-esc="item.name"/>
+                    </a>
+                    <t t-if="item.active and item.kids.length">
+                        <a href="#" t-foreach="item.kids" t-as="kid" t-key="kid.id" class="z755_nav_sub"
+                           t-att-class="{'active': kid.active}" t-on-click.prevent="() => this.menus.selectMenu(kid.menu)">
+                            <t t-esc="kid.name"/>
+                        </a>
+                    </t>
+                </t>
+            </nav>
+            <div class="z755_user">
+                <div class="z755_avatar"><t t-esc="initials"/></div>
+                <div>
+                    <div class="z755_user_name"><t t-esc="user.name"/></div>
+                    <div class="z755_user_sub">Đang đăng nhập</div>
+                </div>
+            </div>
+            <div class="z755_disclaimer">Dữ liệu hiển thị lấy từ hệ thống; mockup chỉ minh họa giao diện.</div>
+        </aside>
+    </t>
+
+    <t t-name="z755_kpi.Dashboard">
+        <div class="z755_screen o_action">
+            <div class="z755_head">
+                <div>
+                    <h1>Bảng điều khiển KPI</h1>
+                    <div class="z755_subtitle">Tổng quan thực hiện KPI toàn Công ty</div>
+                </div>
+                <div class="z755_pills">
+                    <span class="z755_pill blue" t-if="state.data.period">Kỳ <t t-esc="state.data.period"/></span>
+                    <span class="z755_pill plum" t-if="state.data.period_state"><t t-esc="state.data.period_state"/></span>
+                </div>
+            </div>
+            <div class="z755_body">
+                <div class="z755_tiles">
+                    <div t-foreach="state.data.tiles" t-as="t" t-key="t_index" t-attf-class="z755_tile {{t.color}}">
+                        <div class="lbl"><t t-esc="t.label"/></div>
+                        <div class="val"><t t-esc="t.value"/></div>
+                        <div class="sub"><t t-esc="t.sub"/></div>
+                        <div class="bar"/>
+                    </div>
+                </div>
+                <div class="z755_row">
+                    <div class="z755_card z755_grow">
+                        <h3>Tiến độ theo đơn vị</h3>
+                        <div class="z755_prog" t-foreach="state.data.units" t-as="u" t-key="u.id">
+                            <span class="name"><t t-esc="u.name"/></span>
+                            <span class="track"><span t-attf-class="fill {{u.color}}" t-attf-style="width: #{u.value}%"/></span>
+                            <span class="pct"><t t-esc="u.value"/>%</span>
+                        </div>
+                        <div class="z755_muted" t-if="!state.data.units.length">Chưa có bảng giao trong kỳ.</div>
+                    </div>
+                    <div class="z755_card z755_side">
+                        <h3>Cần xử lý hôm nay</h3>
+                        <div t-foreach="state.data.todo" t-as="t" t-key="t_index" t-attf-class="z755_todo {{t.color}}"
+                             t-on-click="() => this.todoClick(t)">
+                            <span class="n"><t t-esc="t.n"/></span>
+                            <span><t t-esc="t.label"/></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="z755_card">
+                    <h3>Thao tác nhanh</h3>
+                    <div class="z755_actions">
+                        <button class="z755_btn primary" t-on-click="() => this.open('z755_kpi.action_kpi_assign_unit')">Giao KPI</button>
+                        <button class="z755_btn" t-on-click="() => this.open('z755_kpi.action_kpi_appraisal')">Mở thẩm định</button>
+                        <button class="z755_btn" t-on-click="() => this.open('z755_kpi.action_kpi_team')">Tổ KPI tổng hợp</button>
+                        <button class="z755_btn" t-on-click="() => this.open('z755_kpi.action_kpi_report_summary')">Xem báo cáo</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+
+    <t t-name="z755_kpi.My">
+        <div class="z755_screen o_action">
+            <div class="z755_head">
+                <div>
+                    <h1>KPI của tôi</h1>
+                    <div class="z755_subtitle"><t t-esc="state.data.subtitle"/> • Theo dõi nhiệm vụ cá nhân</div>
+                </div>
+                <div class="z755_pills">
+                    <span class="z755_pill blue" t-if="state.data.period">Kỳ <t t-esc="state.data.period"/></span>
+                    <span class="z755_pill plum" t-if="state.data.state"><t t-esc="state.data.state"/></span>
+                </div>
+            </div>
+            <div class="z755_body">
+                <div class="z755_tiles">
+                    <div t-foreach="state.data.tiles" t-as="t" t-key="t_index" t-attf-class="z755_tile {{t.color}}">
+                        <div class="lbl"><t t-esc="t.label"/></div>
+                        <div class="val"><t t-esc="t.value"/></div>
+                        <div class="sub"><t t-esc="t.sub"/></div>
+                        <div class="bar"/>
+                    </div>
+                </div>
+                <div class="z755_card z755_kpi_item" t-foreach="state.data.lines" t-as="l" t-key="l.id">
+                    <div class="z755_grow">
+                        <div class="title"><t t-esc="l.name"/></div>
+                        <div class="meta">Chỉ tiêu: <t t-esc="l.target"/> • Trọng số: <t t-esc="l.weight"/> • Hạn: <t t-esc="l.due"/></div>
+                    </div>
+                    <div class="z755_prog inline">
+                        <span class="track"><span t-attf-class="fill {{l.color}}" t-attf-style="width: #{l.progress}%"/></span>
+                        <span class="pct"><t t-esc="l.progress"/>%</span>
+                    </div>
+                    <button class="z755_btn" t-on-click="() => this.updateLine(l)">Cập nhật</button>
+                </div>
+                <div class="z755_muted" t-if="!state.data.lines.length">Bạn chưa được giao KPI trong kỳ này.</div>
+                <div class="z755_actions right">
+                    <button class="z755_btn primary" t-on-click="openAssignment">Tự đánh giá</button>
+                    <button class="z755_btn" t-on-click="openAssignment">Thêm minh chứng</button>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

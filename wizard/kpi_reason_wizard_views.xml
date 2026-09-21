@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_kpi_reason_wizard_form" model="ir.ui.view">
+        <field name="name">kpi.reason.wizard.form</field>
+        <field name="model">kpi.reason.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Nhập lý do">
+                <group>
+                    <field name="assignment_id" readonly="1"/>
+                    <field name="kind" readonly="1"/>
+                    <field name="reason" placeholder="Lý do bắt buộc, được lưu vào lịch sử phê duyệt..."/>
+                </group>
+                <footer>
+                    <button string="Xác nhận" name="action_confirm" type="object" class="btn-primary"/>
+                    <button string="Hủy" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_kpi_rule_list" model="ir.ui.view">
+        <field name="name">kpi.scoring.rule.list</field>
+        <field name="model">kpi.scoring.rule</field>
+        <field name="arch" type="xml">
+            <list decoration-muted="state=='retired'">
+                <field name="code"/><field name="name"/><field name="method"/><field name="version"/>
+                <field name="score_cap"/><field name="usage_count" string="Đang dùng"/>
+                <field name="is_inline"/>
+                <field name="state" widget="badge" decoration-success="state=='confirmed'" decoration-warning="state=='proposed'"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_kpi_rule_form" model="ir.ui.view">
+        <field name="name">kpi.scoring.rule.form</field>
+        <field name="model">kpi.scoring.rule</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_save_to_library" type="object" string="Lưu vào thư viện" class="btn-primary"
+                            invisible="not is_inline"/>
+                    <button name="action_confirm" type="object" string="Xác nhận dùng chung"
+                            invisible="is_inline or state != 'proposed'" groups="z755_kpi.group_kpi_assigner"/>
+                    <button name="action_new_version" type="object" string="Tạo phiên bản mới" invisible="is_inline"/>
+                    <button name="action_retire" type="object" string="Ngừng dùng" invisible="is_inline or state == 'retired'"
+                            groups="z755_kpi.group_kpi_leader"/>
+                    <field name="state" widget="statusbar" invisible="is_inline"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="code"/><field name="name"/><field name="method"/><field name="version"/>
+                            <field name="scope"/><field name="is_inline" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="score_cap"/><field name="score_floor"/><field name="combine_mode"/>
+                            <field name="exception_deduct_pct"/><field name="valid_from"/><field name="valid_to"/>
+                            <field name="previous_rule_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Điều kiện &amp; hành động" invisible="method in ('RATE','REVERSE_RATE','BINARY','MANUAL')">
+                            <div class="text-muted">Điều kiện đầu tiên theo thứ tự ưu tiên (Sequence) thỏa mãn sẽ được áp dụng. THRESHOLD dùng Toán tử/Ngưỡng/Gán điểm; DATE_DELAY: mỗi <b>Bước</b> ngày chậm trừ <b>Giá trị</b>%; INCIDENT_COUNT: dòng Trừ % là mức trừ mỗi lỗi, dòng Đặt 0 điểm áp dụng cho sự việc Nghiêm trọng; LEVEL: mỗi mức độ một dòng.</div>
+                            <field name="line_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="label"/><field name="condition_op"/><field name="threshold"/>
+                                    <field name="level"/><field name="action"/><field name="value"/><field name="step"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Mô tả"><field name="description"/><field name="priority_note"/></page>
+                        <page string="Nơi đang sử dụng" invisible="is_inline">
+                            <field name="kpi_line_ids" readonly="1">
+                                <list><field name="period_id"/><field name="assignment_id"/><field name="kpi_id"/><field name="weight_pct"/></list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+    <record id="view_kpi_rule_search" model="ir.ui.view">
+        <field name="name">kpi.scoring.rule.search</field>
+        <field name="model">kpi.scoring.rule</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/><field name="code"/><field name="method"/>
+                <filter name="library" string="Thư viện" domain="[('is_inline','=',False)]"/>
+                <filter name="valid" string="Đang hiệu lực" domain="[('state','!=','retired')]"/>
+                <group expand="0" string="Nhóm theo">
+                    <filter name="g_method" string="Phương pháp" context="{'group_by':'method'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    <record id="action_kpi_rule" model="ir.actions.act_window">
+        <field name="name">Quy tắc chấm</field>
+        <field name="res_model">kpi.scoring.rule</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_library': 1, 'search_default_valid': 1}</field>
+    </record>
+</odoo>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="cron_kpi_deadline" model="ir.cron">
+        <field name="name">KPI: nhắc việc sắp/quá hạn</field>
+        <field name="model_id" ref="model_kpi_assignment"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_deadline_reminder()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+    </record>
+</odoo>

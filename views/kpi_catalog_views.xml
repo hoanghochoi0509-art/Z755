@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_kpi_catalog_list" model="ir.ui.view">
+        <field name="name">kpi.catalog.list</field>
+        <field name="model">kpi.catalog</field>
+        <field name="arch" type="xml">
+            <list decoration-muted="state=='retired'" decoration-warning="state=='proposed'">
+                <field name="code"/><field name="name"/><field name="kpi_type"/><field name="uom_id"/>
+                <field name="field_id"/><field name="usage_count" string="Đã dùng"/>
+                <field name="state" widget="badge" decoration-success="state=='confirmed'" decoration-warning="state=='proposed'"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_kpi_catalog_form" model="ir.ui.view">
+        <field name="name">kpi.catalog.form</field>
+        <field name="model">kpi.catalog</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_confirm" type="object" string="Xác nhận dùng chung" class="btn-primary"
+                            invisible="state != 'proposed'" groups="z755_kpi.group_kpi_assigner"/>
+                    <button name="action_retire" type="object" string="Ngừng dùng" invisible="state == 'retired'"
+                            groups="z755_kpi.group_kpi_leader"/>
+                    <button name="action_propose" type="object" string="Đặt lại Đề xuất" invisible="state != 'retired'"
+                            groups="z755_kpi.group_kpi_leader"/>
+                    <field name="state" widget="statusbar" statusbar_visible="proposed,confirmed,retired"/>
+                </header>
+                <sheet>
+                    <div class="alert alert-warning" invisible="not similar_hint"><field name="similar_hint"/></div>
+                    <group>
+                        <group>
+                            <field name="code"/><field name="name"/><field name="group_id"/><field name="field_id"/>
+                        </group>
+                        <group>
+                            <field name="kpi_type"/><field name="value_type"/><field name="uom_id"/>
+                            <field name="usage_count"/>
+                        </group>
+                    </group>
+                    <field name="description" placeholder="Mô tả/cách hiểu KPI..."/>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+    <record id="view_kpi_catalog_search" model="ir.ui.view">
+        <field name="name">kpi.catalog.search</field>
+        <field name="model">kpi.catalog</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" filter_domain="['|',('name','ilike',self),('code','ilike',self)]" string="Tên/mã KPI"/>
+                <field name="field_id"/>
+                <filter name="confirmed" string="Đã xác nhận" domain="[('state','=','confirmed')]"/>
+                <filter name="proposed" string="Đề xuất" domain="[('state','=','proposed')]"/>
+                <filter name="active_use" string="Đang sử dụng" domain="[('state','!=','retired')]"/>
+                <group expand="0" string="Nhóm theo">
+                    <filter name="g_field" string="Lĩnh vực" context="{'group_by':'field_id'}"/>
+                    <filter name="g_type" string="Loại KPI" context="{'group_by':'kpi_type'}"/>
+                    <filter name="g_state" string="Trạng thái" context="{'group_by':'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    <record id="action_kpi_catalog" model="ir.actions.act_window">
+        <field name="name">Danh mục KPI</field>
+        <field name="res_model">kpi.catalog</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_active_use': 1}</field>
+    </record>
+</odoo>

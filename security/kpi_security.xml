@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="module_category_kpi" model="ir.module.category">
+        <field name="name">KPI</field>
+        <field name="sequence">40</field>
+    </record>
+
+    <record id="group_kpi_employee" model="res.groups">
+        <field name="name">Cá nhân được đánh giá</field>
+        <field name="category_id" ref="module_category_kpi"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+    <record id="group_kpi_unit_editor" model="res.groups">
+        <field name="name">Người lập KPI đơn vị</field>
+        <field name="category_id" ref="module_category_kpi"/>
+        <field name="implied_ids" eval="[(4, ref('group_kpi_employee'))]"/>
+    </record>
+    <record id="group_kpi_unit_manager" model="res.groups">
+        <field name="name">Chỉ huy đơn vị</field>
+        <field name="category_id" ref="module_category_kpi"/>
+        <field name="implied_ids" eval="[(4, ref('group_kpi_unit_editor'))]"/>
+    </record>
+    <record id="group_kpi_assigner" model="res.groups">
+        <field name="name">Người/Tổ giao KPI</field>
+        <field name="category_id" ref="module_category_kpi"/>
+        <field name="implied_ids" eval="[(4, ref('group_kpi_employee'))]"/>
+    </record>
+    <record id="group_kpi_reviewer" model="res.groups">
+        <field name="name">Cơ quan/người thẩm định</field>
+        <field name="category_id" ref="module_category_kpi"/>
+        <field name="implied_ids" eval="[(4, ref('group_kpi_employee'))]"/>
+    </record>
+    <record id="group_kpi_member" model="res.groups">
+        <field name="name">Thành viên Tổ KPI</field>
+        <field name="category_id" ref="module_category_kpi"/>
+        <field name="implied_ids" eval="[(4, ref('group_kpi_employee'))]"/>
+    </record>
+    <record id="group_kpi_leader" model="res.groups">
+        <field name="name">Tổ trưởng KPI</field>
+        <field name="category_id" ref="module_category_kpi"/>
+        <field name="implied_ids" eval="[(4, ref('group_kpi_member')), (4, ref('group_kpi_assigner')), (4, ref('group_kpi_reviewer')), (4, ref('group_kpi_unit_manager'))]"/>
+    </record>
+    <record id="group_kpi_approver" model="res.groups">
+        <field name="name">Cấp phê duyệt</field>
+        <field name="category_id" ref="module_category_kpi"/>
+        <field name="implied_ids" eval="[(4, ref('group_kpi_employee'))]"/>
+    </record>
+    <record id="group_kpi_admin" model="res.groups">
+        <field name="name">Quản trị kỹ thuật KPI</field>
+        <field name="category_id" ref="module_category_kpi"/>
+        <field name="implied_ids" eval="[(4, ref('group_kpi_employee'))]"/>
+        <field name="users" eval="[(4, ref('base.user_admin'))]"/>
+    </record>
+</odoo>

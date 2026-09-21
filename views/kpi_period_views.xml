@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_kpi_period_list" model="ir.ui.view">
+        <field name="name">kpi.period.list</field>
+        <field name="model">kpi.period</field>
+        <field name="arch" type="xml">
+            <list decoration-muted="state in ('closed','locked')">
+                <field name="code"/><field name="name"/><field name="period_type"/>
+                <field name="date_start"/><field name="date_end"/>
+                <field name="deadline_self"/><field name="deadline_appraisal"/><field name="deadline_approval"/>
+                <field name="regulation_ref"/>
+                <field name="state" widget="badge" decoration-success="state=='open'" decoration-info="state=='draft'"/>
+                <field name="progress" widget="progressbar"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_kpi_period_form" model="ir.ui.view">
+        <field name="name">kpi.period.form</field>
+        <field name="model">kpi.period</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_open" type="object" string="Mở kỳ" class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_close" type="object" string="Đóng kỳ" invisible="state != 'open'"/>
+                    <button name="action_lock" type="object" string="Khóa kỳ" invisible="state not in ('open','closed')"
+                            confirm="Khóa kỳ sẽ chuyển toàn bộ hồ sơ đã phê duyệt sang chỉ đọc. Tiếp tục?"/>
+                    <button name="action_draft" type="object" string="Về nháp" invisible="state != 'open'"/>
+                    <button name="action_copy_period" type="object" string="Sao chép kỳ"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,open,closed,locked"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_assignments" type="object" class="oe_stat_button" icon="fa-list">
+                            <field name="assignment_count" widget="statinfo" string="Bảng giao"/>
+                        </button>
+                    </div>
+                    <div class="alert alert-warning" role="alert" invisible="not cutoff_warning">
+                        <field name="cutoff_warning" readonly="1"/>
+                    </div>
+                    <div class="alert alert-info" role="alert" invisible="not regulation_is_draft">
+                        Căn cứ áp dụng còn ở trạng thái DỰ THẢO: chỉ dùng cấu hình thử nghiệm cho pilot. Trước go-live phải gắn văn bản đã phê duyệt.
+                    </div>
+                    <group>
+                        <group string="Thông tin kỳ">
+                            <field name="name"/><field name="code"/><field name="period_type"/>
+                            <field name="date_start"/><field name="date_end"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group string="Quy chế áp dụng">
+                            <field name="regulation_ref"/><field name="regulation_effective_date"/>
+                            <field name="config_version"/><field name="regulation_is_draft"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Mốc thời gian quy trình">
+                            <field name="deadline_assign"/>
+                            <field name="data_cutoff_datetime"/>
+                            <field name="deadline_self"/><field name="deadline_appraisal"/><field name="deadline_approval"/>
+                        </group>
+                        <group string="Cấu hình chấm điểm theo kỳ">
+                            <field name="reviewer_agg_method"/>
+                            <field name="score_digits"/><field name="round_at"/><field name="total_cap_mode"/>
+                            <field name="require_reason_on_diff"/><field name="diff_threshold"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Quyền tạo động">
+                            <field name="allow_inline_kpi"/><field name="allow_inline_rule"/>
+                        </group>
+                        <group string="Quy trình KPI cá nhân">
+                            <field name="personal_use_kpi_team"/><field name="personal_use_approval"/>
+                        </group>
+                    </group>
+                    <field name="progress" invisible="1"/>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+    <record id="view_kpi_period_search" model="ir.ui.view">
+        <field name="name">kpi.period.search</field>
+        <field name="model">kpi.period</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/><field name="code"/>
+                <filter name="open" string="Đang mở" domain="[('state','=','open')]"/>
+                <group expand="0" string="Nhóm theo">
+                    <filter name="g_type" string="Loại kỳ" context="{'group_by':'period_type'}"/>
+                    <filter name="g_state" string="Trạng thái" context="{'group_by':'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    <record id="action_kpi_period" model="ir.actions.act_window">
+        <field name="name">Kỳ đánh giá</field>
+        <field name="res_model">kpi.period</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

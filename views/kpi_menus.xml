@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_kpi_root" name="KPI" web_icon="z755_kpi,static/description/icon.png" sequence="45"
+              groups="z755_kpi.group_kpi_employee"/>
+    <menuitem id="menu_kpi_dashboard" name="Bảng điều khiển" parent="menu_kpi_root" action="action_kpi_dashboard_client" sequence="1"/>
+    <menuitem id="menu_kpi_period" name="Kỳ đánh giá" parent="menu_kpi_root" action="action_kpi_period" sequence="2"
+              groups="z755_kpi.group_kpi_assigner"/>
+
+    <menuitem id="menu_kpi_assign" name="Giao KPI" parent="menu_kpi_root" sequence="3" groups="z755_kpi.group_kpi_unit_editor,z755_kpi.group_kpi_assigner"/>
+    <menuitem id="menu_kpi_assign_company" name="Công ty" parent="menu_kpi_assign" action="action_kpi_assign_company" sequence="1"/>
+    <menuitem id="menu_kpi_assign_unit" name="Đơn vị" parent="menu_kpi_assign" action="action_kpi_assign_unit" sequence="2"/>
+    <menuitem id="menu_kpi_assign_personal" name="Cá nhân" parent="menu_kpi_assign" action="action_kpi_assign_personal" sequence="3"/>
+
+    <menuitem id="menu_kpi_exec" name="Thực hiện KPI" parent="menu_kpi_root" sequence="4"/>
+    <menuitem id="menu_kpi_my" name="KPI của tôi" parent="menu_kpi_exec" action="action_kpi_my_client" sequence="1"/>
+    <menuitem id="menu_kpi_unit_tracking" name="KPI đơn vị" parent="menu_kpi_exec" action="action_kpi_unit_tracking" sequence="2"/>
+    
+    <menuitem id="menu_kpi_eval" name="Đánh giá" parent="menu_kpi_root" sequence="5"/>
+    <menuitem id="menu_kpi_self" name="Tự đánh giá" parent="menu_kpi_eval" action="action_kpi_self_review" sequence="1"/>
+    <menuitem id="menu_kpi_appraisal" name="Thẩm định" parent="menu_kpi_eval" action="action_kpi_appraisal" sequence="2"
+              groups="z755_kpi.group_kpi_reviewer,z755_kpi.group_kpi_member"/>
+    <menuitem id="menu_kpi_team" name="Tổ KPI" parent="menu_kpi_eval" action="action_kpi_team" sequence="3"
+              groups="z755_kpi.group_kpi_member"/>
+    <menuitem id="menu_kpi_approval" name="Phê duyệt" parent="menu_kpi_eval" action="action_kpi_approval" sequence="4"
+              groups="z755_kpi.group_kpi_approver,z755_kpi.group_kpi_leader"/>
+
+    <menuitem id="menu_kpi_weekly" name="Theo dõi tuần" parent="menu_kpi_root" action="action_kpi_weekly" sequence="6"/>
+
+    <menuitem id="menu_kpi_event" name="Nhật ký KPI" parent="menu_kpi_root" action="action_kpi_event" sequence="7"/>
+
+    <menuitem id="menu_kpi_report" name="Báo cáo" parent="menu_kpi_root" sequence="8"
+              groups="z755_kpi.group_kpi_unit_manager,z755_kpi.group_kpi_member,z755_kpi.group_kpi_approver"/>
+    <menuitem id="menu_kpi_rep_summary" name="Tổng hợp điểm đơn vị" parent="menu_kpi_report" action="action_kpi_report_summary" sequence="1"/>
+    <menuitem id="menu_kpi_rep_personal" name="Tổng hợp điểm cá nhân" parent="menu_kpi_report" action="action_kpi_report_personal" sequence="2"/>
+    <menuitem id="menu_kpi_rep_overdue" name="KPI quá hạn" parent="menu_kpi_report" action="action_kpi_report_overdue" sequence="3"/>
+    <menuitem id="menu_kpi_rep_deducted" name="KPI bị trừ điểm" parent="menu_kpi_report" action="action_kpi_report_deducted" sequence="4"/>
+    <menuitem id="menu_kpi_rep_diff" name="Chênh lệch đánh giá" parent="menu_kpi_report" action="action_kpi_report_diff" sequence="5"/>
+    <menuitem id="menu_kpi_rep_audit" name="Lịch sử điều chỉnh (audit)" parent="menu_kpi_report" action="action_kpi_report_audit" sequence="6"
+              groups="z755_kpi.group_kpi_leader,z755_kpi.group_kpi_admin"/>
+
+    <menuitem id="menu_kpi_config" name="Danh mục &amp; cấu hình" parent="menu_kpi_root" sequence="9" groups="z755_kpi.group_kpi_unit_editor"/>
+    <menuitem id="menu_kpi_catalog" name="Danh mục KPI" parent="menu_kpi_config" action="action_kpi_catalog" sequence="1"/>
+    <menuitem id="menu_kpi_rule" name="Quy tắc chấm" parent="menu_kpi_config" action="action_kpi_rule" sequence="2"/>
+    <menuitem id="menu_kpi_source" name="Nguồn dữ liệu" parent="menu_kpi_config" action="action_kpi_source" sequence="3"/>
+    <menuitem id="menu_kpi_group" name="Nhóm KPI / BSC" parent="menu_kpi_config" action="action_kpi_group" sequence="4"/>
+    <menuitem id="menu_kpi_field" name="Lĩnh vực" parent="menu_kpi_config" action="action_kpi_field" sequence="5"/>
+    <menuitem id="menu_kpi_uom" name="Đơn vị tính" parent="menu_kpi_config" action="action_kpi_uom" sequence="6"/>
+</odoo>

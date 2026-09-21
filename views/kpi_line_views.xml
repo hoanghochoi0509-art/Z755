@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_kpi_line_form" model="ir.ui.view">
+        <field name="name">kpi.assignment.line.form</field>
+        <field name="model">kpi.assignment.line</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <field name="is_locked" invisible="1"/>
+                    <field name="assignment_state" invisible="1"/>
+                    <field name="rule_mode" invisible="0" readonly="is_locked"/>
+                    <div class="oe_title"><h2><field name="kpi_name"/></h2></div>
+                    <group>
+                        <group string="Chỉ tiêu &amp; trọng số (theo kỳ)">
+                            <field name="assignment_id" readonly="1"/>
+                            <field name="kpi_id" readonly="is_locked"/>
+                            <field name="uom_id" readonly="is_locked"/>
+                            <field name="target_operator" readonly="is_locked"/>
+                            <field name="target_value" readonly="is_locked"/>
+                            <field name="target_date" readonly="is_locked"/>
+                            <field name="target_text" readonly="is_locked"/>
+                            <field name="weight_pct" readonly="is_locked"/>
+                            <field name="score_cap" readonly="is_locked"/>
+                            <field name="due_date" readonly="is_locked"/>
+                            <field name="enhanced_control" readonly="is_locked"/>
+                        </group>
+                        <group string="6 rõ: người, sản phẩm, nguồn">
+                            <field name="output_product" readonly="is_locked"/>
+                            <field name="responsible_id" readonly="is_locked"/>
+                            <field name="collaborator_ids" widget="many2many_tags" readonly="is_locked"/>
+                            <field name="data_source_id" readonly="is_locked"/>
+                            <field name="review_department_ids" widget="many2many_tags" readonly="is_locked"/>
+                            <field name="reviewer_ids" widget="many2many_tags" readonly="is_locked"/>
+                            <field name="approval_role" readonly="is_locked"/>
+                            <field name="approver_ids" widget="many2many_tags" readonly="is_locked"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Quy tắc chấm">
+                            <group>
+                                <group>
+                                    <field name="scoring_rule_id" invisible="rule_mode != 'library'" readonly="is_locked"/>
+                                    <field name="inline_rule_id" invisible="rule_mode != 'inline'" readonly="1"/>
+                                    <field name="save_rule_to_library" invisible="rule_mode != 'inline'" readonly="is_locked"/>
+                                    <field name="rule_method"/>
+                                </group>
+                                <group>
+                                    <button name="action_create_inline_rule" type="object" string="Tạo quy tắc trực tiếp" class="btn-secondary"
+                                            invisible="rule_mode != 'inline' or inline_rule_id or is_locked"/>
+                                    <button name="action_edit_inline_rule" type="object" string="Sửa quy tắc trực tiếp" class="btn-secondary"
+                                            invisible="rule_mode != 'inline' or not inline_rule_id or is_locked"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Mục tiêu cấp trên">
+                            <group>
+                                <group>
+                                    <field name="parent_line_id" readonly="is_locked"/>
+                                    <field name="source_level"/>
+                                    <field name="cascade_type" readonly="is_locked"/>
+                                    <field name="allocated_target" readonly="is_locked"/>
+                                    <field name="proposed_by_employee"/>
+                                </group>
+                            </group>
+                            <field name="child_line_ids" readonly="1">
+                                <list><field name="assignment_id"/><field name="cascade_type"/><field name="allocated_target"/><field name="weight_pct"/></list>
+                            </field>
+                        </page>
+                        <page string="Thực hiện" invisible="assignment_state in ('draft','negotiating','submit_assign')">
+                            <group>
+                                <group string="Kết quả thực tế">
+                                    <field name="actual_value" readonly="assignment_state not in ('assigned','in_progress','self_review')"/>
+                                    <field name="actual_date" readonly="assignment_state not in ('assigned','in_progress','self_review')"/>
+                                    <field name="progress_pct" readonly="assignment_state not in ('assigned','in_progress','self_review')"/>
+                                    <field name="actual_text" readonly="assignment_state not in ('assigned','in_progress','self_review')"/>
+                                    <field name="actual_entered" readonly="assignment_state not in ('assigned','in_progress','self_review')"/>
+                                </group>
+                                <group string="Ngoại lệ khách quan">
+                                    <field name="objective_exception"/>
+                                    <field name="exception_confirmed_by" invisible="not objective_exception"/>
+                                    <field name="exception_note" invisible="not objective_exception"/>
+                                </group>
+                            </group>
+                            <group string="Điểm (mỗi bước lưu độc lập)">
+                                <group>
+                                    <field name="achievement_rate"/><field name="system_score"/><field name="system_note"/>
+                                    <field name="self_score"/><field name="reviewer_score"/><field name="team_score"/><field name="final_score"/>
+                                </group>
+                                <group><field name="weight_pct"/><field name="system_weighted"/><field name="self_weighted"/>
+                                    <field name="reviewer_weighted"/><field name="team_weighted"/><field name="final_weighted"/></group>
+                            </group>
+                            <button name="action_add_evidence" type="object" string="Thêm minh chứng" class="btn-secondary"/>
+                            <field name="evidence_ids">
+                                <list><field name="name"/><field name="evidence_type"/><field name="attachment_ids" widget="many2many_binary"/>
+                                    <field name="link_url"/><field name="uploaded_by"/><field name="uploaded_at"/></list>
+                            </field>
+                        </page>
+                        <page string="Ảnh chụp khi giao" invisible="not is_locked">
+                            <group><field name="kpi_code_snapshot"/><field name="kpi_name_snapshot"/>
+                                <field name="rule_version_snapshot"/><field name="snapshot_json"/></group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_kpi_line_list" model="ir.ui.view">
+        <field name="name">kpi.assignment.line.list</field>
+        <field name="model">kpi.assignment.line</field>
+        <field name="arch" type="xml">
+            <list decoration-danger="overdue" create="0">
+                <field name="period_id"/><field name="assignment_id"/><field name="kpi_code"/><field name="kpi_name"/>
+                <field name="target_value"/><field name="weight_pct"/><field name="due_date"/><field name="responsible_id"/>
+                <field name="actual_value"/><field name="system_score"/><field name="self_score"/>
+                <field name="reviewer_score"/><field name="team_score"/><field name="final_score"/>
+                <field name="overdue" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_kpi_line_search" model="ir.ui.view">
+        <field name="name">kpi.assignment.line.search</field>
+        <field name="model">kpi.assignment.line</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="kpi_id"/><field name="assignment_id"/><field name="responsible_id"/>
+                <filter name="overdue" string="Quá hạn" domain="[('overdue','=',True)]"/>
+                <filter name="diff" string="Có chênh lệch" domain="[('diff_flag','=',True)]"/>
+                <filter name="deducted" string="Bị trừ điểm" domain="[('system_score','&lt;',100),('has_system_score','=',True)]"/>
+                <group expand="0" string="Nhóm theo">
+                    <filter name="g_period" string="Kỳ" context="{'group_by':'period_id'}"/>
+                    <filter name="g_dept" string="Đơn vị" context="{'group_by':'department_id'}"/>
+                    <filter name="g_kpi" string="KPI" context="{'group_by':'kpi_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    <record id="view_kpi_line_pivot" model="ir.ui.view">
+        <field name="name">kpi.assignment.line.pivot</field>
+        <field name="model">kpi.assignment.line</field>
+        <field name="arch" type="xml">
+            <pivot>
+                <field name="department_id" type="row"/>
+                <field name="period_id" type="col"/>
+                <field name="self_weighted" type="measure"/>
+                <field name="reviewer_weighted" type="measure"/>
+                <field name="team_weighted" type="measure"/>
+                <field name="final_weighted" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+    <record id="view_kpi_line_graph" model="ir.ui.view">
+        <field name="name">kpi.assignment.line.graph</field>
+        <field name="model">kpi.assignment.line</field>
+        <field name="arch" type="xml">
+            <graph type="bar">
+                <field name="department_id"/>
+                <field name="final_weighted" type="measure"/>
+            </graph>
+        </field>
+    </record>
+</odoo>
